@@ -34,103 +34,59 @@ function updateAdminUI() {
   }
 }
 
-function loadAllLevels() {
+async function loadAllLevels() {
   let deletedBaseIds = [];
-  const deletedSaved = localStorage.getItem("buscar_diferencias_deleted_base_levels");
-  if (deletedSaved) {
-    try {
-      deletedBaseIds = JSON.parse(deletedSaved);
-    } catch (e) {
-      deletedBaseIds = [];
+  try {
+    const deletedRes = await fetch('/api/deleted-levels');
+    if (deletedRes.ok) deletedBaseIds = await deletedRes.json();
+  } catch (e) { console.error("Error fetching deleted levels:", e); }
+
+  let customLevels = [];
+  try {
+    const customRes = await fetch('/api/custom-levels');
+    if (customRes.ok) {
+      customLevels = await customRes.json();
+      customLevels.forEach(lvl => lvl.isCustom = true);
     }
-  }
+  } catch (e) { console.error("Error fetching custom levels:", e); }
 
   activeLevels = GAME_LEVELS.filter(lvl => !deletedBaseIds.includes(lvl.id));
-
-  const saved = localStorage.getItem("buscar_diferencias_custom_levels");
-  if (saved) {
-    try {
-      const custom = JSON.parse(saved);
-      custom.forEach(lvl => {
-        lvl.isCustom = true;
-      });
-      activeLevels = [...activeLevels, ...custom];
-    } catch (e) {
-      console.error("Error loading custom levels:", e);
-    }
-  }
+  activeLevels = [...activeLevels, ...customLevels];
 }
 
 async function deleteLevel(levelId, isCustom) {
   if (isCustom) {
-    let savedLevels = [];
-    const saved = localStorage.getItem("buscar_diferencias_custom_levels");
-    if (saved) {
-      try {
-        savedLevels = JSON.parse(saved);
-      } catch (e) {
-        savedLevels = [];
-      }
-    }
-    savedLevels = savedLevels.filter(lvl => lvl.id !== levelId);
-    localStorage.setItem("buscar_diferencias_custom_levels", JSON.stringify(savedLevels));
-    
     try {
-      await fetch('/api/custom-levels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(savedLevels)
-      });
-    } catch (e) {
-      console.error("Error syncing deleted custom level to server:", e);
-    }
+      const res = await fetch('/api/custom-levels');
+      let savedLevels = res.ok ? await res.json() : [];
+      savedLevels = savedLevels.filter(lvl => lvl.id !== levelId);
+      await fetch('/api/custom-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savedLevels) });
+    } catch (e) { console.error("Error deleting custom level:", e); }
   } else {
-    let deletedBaseIds = [];
-    const saved = localStorage.getItem("buscar_diferencias_deleted_base_levels");
-    if (saved) {
-      try {
-        deletedBaseIds = JSON.parse(saved);
-      } catch (e) {
-        deletedBaseIds = [];
-      }
-    }
-    if (!deletedBaseIds.includes(levelId)) {
-      deletedBaseIds.push(levelId);
-    }
-    localStorage.setItem("buscar_diferencias_deleted_base_levels", JSON.stringify(deletedBaseIds));
-    
     try {
-      await fetch('/api/deleted-levels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(deletedBaseIds)
-      });
-    } catch (e) {
-      console.error("Error syncing deleted base level to server:", e);
-    }
+      const res = await fetch('/api/deleted-levels');
+      let deletedBaseIds = res.ok ? await res.json() : [];
+      if (!deletedBaseIds.includes(levelId)) deletedBaseIds.push(levelId);
+      await fetch('/api/deleted-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(deletedBaseIds) });
+    } catch (e) { console.error("Error deleting base level:", e); }
   }
   
   GameState.completedLevels = GameState.completedLevels.filter(id => id !== levelId);
   GameState.saveProgress();
   
-  loadAllLevels();
+  await loadAllLevels();
   renderLevelGrid();
 }
 
 async function resetEverything() {
   if (confirm("¿Quieres restablecer el juego al estado inicial? Esto restaurará todos los niveles iniciales y borrará tu progreso y niveles creados.")) {
-    localStorage.removeItem("buscar_diferencias_deleted_base_levels");
-    localStorage.removeItem("buscar_diferencias_custom_levels");
-    
     try {
       await fetch('/api/custom-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify([]) });
       await fetch('/api/deleted-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify([]) });
-    } catch (e) {
-      console.error("Error resetting levels on server:", e);
-    }
+    } catch (e) { console.error("Error resetting levels on server:", e); }
 
     GameState.resetProgress();
-    loadAllLevels();
+    await loadAllLevels();
     renderLevelGrid();
     alert("¡Juego restablecido con éxito!");
   }
@@ -414,32 +370,9 @@ const Mascot = {
 // Lógica de Renderizado y Flujo
 // ==========================================================================
 
-async function syncWithServer() {
-  try {
-    const customRes = await fetch('/api/custom-levels');
-    if (customRes.ok) {
-      const customLevels = await customRes.json();
-      localStorage.setItem("buscar_diferencias_custom_levels", JSON.stringify(customLevels));
-    }
-  } catch (e) {
-    console.warn("Could not sync custom levels from server:", e);
-  }
-
-  try {
-    const deletedRes = await fetch('/api/deleted-levels');
-    if (deletedRes.ok) {
-      const deletedLevels = await deletedRes.json();
-      localStorage.setItem("buscar_diferencias_deleted_base_levels", JSON.stringify(deletedLevels));
-    }
-  } catch (e) {
-    console.warn("Could not sync deleted levels from server:", e);
-  }
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
   updateAdminUI();
-  await syncWithServer();
-  loadAllLevels();
+  await loadAllLevels();
   GameState.loadProgress();
   Mascot.init();
   showScreen("menu-screen");
@@ -1411,31 +1344,20 @@ const LevelCreator = {
       isCustom: true
     };
     
-    let savedLevels = [];
-    const saved = localStorage.getItem("buscar_diferencias_custom_levels");
-    if (saved) {
-      try {
-        savedLevels = JSON.parse(saved);
-      } catch (e) {
-        savedLevels = [];
-      }
-    }
-    savedLevels.push(newLevel);
-    localStorage.setItem("buscar_diferencias_custom_levels", JSON.stringify(savedLevels));
-    
     try {
-      await fetch('/api/custom-levels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(savedLevels)
-      });
+      const res = await fetch('/api/custom-levels');
+      let savedLevels = res.ok ? await res.json() : [];
+      savedLevels.push(newLevel);
+      await fetch('/api/custom-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(savedLevels) });
     } catch (e) {
       console.error("Error syncing new level to server:", e);
+      alert("Hubo un error al guardar el nivel.");
+      return;
     }
     
     alert(`¡Nivel "${name}" guardado con éxito! Ya puedes jugarlo en la lista de aventuras.`);
     
-    loadAllLevels();
+    await loadAllLevels();
     renderLevelGrid();
     
     showScreen("level-screen");
