@@ -1,0 +1,1341 @@
+/* ==========================================================================
+   Juego de Buscar Diferencias - Estilo Infantil Premium
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-bg: #0C051D; /* Deep midnight violet */
+  --color-primary: #FF2E93; /* Neon magenta-pink */
+  --color-primary-dark: #C20062;
+  --color-secondary: #00E5FF; /* Neon cyan-teal */
+  --color-secondary-dark: #00A8CC;
+  --color-accent: #FFF500; /* Neon yellow */
+  --color-accent-dark: #C4B200;
+  --color-sky: #A000FF; /* Neon purple */
+  --color-sky-dark: #6E00C4;
+  --color-text: #FFFFFF;
+  --color-border: #14092B; /* Dark borders for cartoon contrast */
+  
+  --font-kids: 'Fredoka', sans-serif;
+  --bubble-shadow: 0 8px 0 var(--color-border);
+  --press-effect: translateY(6px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-kids);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fondo decorativo con nubes */
+.bg-decorations {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.cloud-decor {
+  position: absolute;
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.8));
+  user-select: none;
+  animation: floatCloud 25s linear infinite;
+}
+
+.cloud-decor.c1 {
+  top: 10%; left: -150px;
+  animation-duration: 25s;
+  color: var(--color-secondary);
+}
+
+.cloud-decor.c2 {
+  top: 40%; left: -200px;
+  animation-duration: 35s;
+  animation-delay: 5s;
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 12px rgba(255, 46, 147, 0.8));
+}
+
+.cloud-decor.c3 {
+  top: 75%; left: -120px;
+  animation-duration: 20s;
+  animation-delay: 10s;
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 8px rgba(255, 245, 0, 0.8));
+}
+
+@keyframes floatCloud {
+  0% { left: -200px; transform: rotate(0deg) scale(0.8); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { left: 105vw; transform: rotate(360deg) scale(0.8); }
+}
+
+/* ==========================================================================
+   Componentes de Botones y Tarjetas
+   ========================================================================== */
+
+.btn-kids {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  font-family: var(--font-kids);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: white;
+  border: 4px solid var(--color-border);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+  outline: none;
+  box-shadow: 0 8px 0 var(--color-border);
+}
+
+.btn-kids:active {
+  transform: var(--press-effect);
+  box-shadow: 0 2px 0 var(--color-border);
+}
+
+.btn-kids:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.4) contrast(0.8);
+  box-shadow: 0 3px 0 var(--color-border) !important;
+  transform: translateY(5px) !important;
+  pointer-events: none;
+}
+
+.btn-orange { background-color: var(--color-primary); }
+.btn-orange:hover { background-color: #ff8a65; }
+.btn-green { background-color: var(--color-secondary); }
+.btn-green:hover { background-color: #81c784; }
+.btn-sky { background-color: var(--color-sky); }
+.btn-sky:hover { background-color: #4fc3f7; }
+.btn-yellow { background-color: var(--color-accent); color: var(--color-border) !important; }
+.btn-yellow:hover { background-color: #ffe082; }
+
+/* Botones redondos pequeños */
+.btn-round {
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.6rem;
+}
+
+/* ==========================================================================
+   Pantallas Principales
+   ========================================================================== */
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.screen.active {
+  display: flex;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Pantalla de Inicio (Menú) */
+#menu-screen h1 {
+  font-size: 4.5rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255, 46, 147, 0.6));
+  margin-bottom: 20px;
+  text-align: center;
+  animation: bounceTitle 2s ease-in-out infinite alternate;
+}
+
+@keyframes bounceTitle {
+  0% { transform: translateY(0) rotate(-2deg); }
+  100% { transform: translateY(-10px) rotate(2deg); }
+}
+
+.logo-container {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pantalla de Selección de Niveles */
+#level-screen h2 {
+  font-size: 3rem;
+  margin-bottom: 30px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 40px;
+}
+
+.level-card {
+  background: linear-gradient(135deg, rgba(35, 17, 65, 0.95), rgba(18, 9, 36, 0.95)) !important;
+  border: 4px solid var(--color-primary) !important;
+  border-radius: 30px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(255, 46, 147, 0.3), var(--bubble-shadow);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  color: #fff !important;
+}
+
+.level-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 55%
+  );
+  transform: rotate(45deg);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+.level-card:hover::before {
+  transform: translate(50%, 50%) rotate(45deg);
+}
+
+.level-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(255, 46, 147, 0.6), 0 12px 0 var(--color-border);
+  border-color: var(--color-secondary) !important;
+}
+
+.level-card:active {
+  transform: var(--press-effect);
+  box-shadow: 0 2px 0 var(--color-border);
+}
+
+.level-card.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  border-color: #5d4a7c !important;
+  box-shadow: var(--bubble-shadow) !important;
+  background: rgba(30, 15, 60, 0.45) !important;
+}
+
+.level-card.locked::before {
+  display: none;
+}
+
+.level-card.locked:hover {
+  transform: none;
+  box-shadow: var(--bubble-shadow) !important;
+  border-color: #5d4a7c !important;
+}
+
+.level-card .lock-icon {
+  font-size: 3rem;
+  color: #8d7cae;
+  margin: 15px 0;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.level-card h3 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.level-card .difficulty-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 15px;
+}
+
+.level-card .diff-facil { background-color: var(--color-secondary); }
+.level-card .diff-medio { background-color: var(--color-sky); }
+.level-card .diff-dificil { background-color: var(--color-purple); }
+
+.level-card .stars {
+  font-size: 1.4rem;
+  color: var(--color-accent-dark);
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   Pantalla de Juego
+   ========================================================================== */
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 15px;
+  gap: 15px;
+}
+
+.game-title-bar {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.game-title-bar h2 {
+  font-size: 2.2rem;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+}
+
+.stats-panel {
+  display: flex;
+  gap: 15px;
+}
+
+.stat-bubble {
+  background: rgba(30, 15, 60, 0.85) !important;
+  border: 3px solid var(--color-secondary) !important;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 0 var(--color-border), 0 0 10px rgba(0, 229, 255, 0.2);
+  color: #ffffff !important;
+}
+
+/* Cabecera del juego compacta e integrada (Dashboard Bar) */
+.game-dashboard-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1000px;
+  background: rgba(20, 10, 38, 0.95);
+  border: 3px solid var(--color-border);
+  border-radius: 20px;
+  padding: 8px 15px;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(160, 0, 255, 0.3), var(--bubble-shadow);
+  margin-bottom: 15px;
+}
+
+/* Título de nivel */
+.dashboard-level-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+  margin: 0;
+  flex-grow: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Stats Pill (Estrellas y Vidas) */
+.dashboard-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(0, 229, 255, 0.2);
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+#lives-container {
+  letter-spacing: -2px;
+  min-width: 80px;
+  justify-content: center;
+}
+
+#lives-container span {
+  font-size: 1.1rem !important;
+}
+
+/* Botones compactos redondos */
+.btn-compact-round {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  border-width: 3px;
+  box-shadow: 0 4px 0 var(--color-border);
+}
+
+.btn-compact-round:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+/* Botón de volver con estilo neon puro (sin fondo lila) */
+.btn-back-neon {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-shadow: 0 0 8px var(--color-secondary), 0 0 15px rgba(0, 229, 255, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s ease, text-shadow 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  user-select: none;
+}
+
+.btn-back-neon:hover {
+  transform: scale(1.15);
+  text-shadow: 0 0 12px var(--color-secondary), 0 0 22px rgba(0, 229, 255, 0.8);
+}
+
+.btn-back-neon:active {
+  transform: scale(0.9);
+}
+
+/* Contenedor del temporizador integrado al fondo de la barra */
+.dashboard-timer-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, var(--color-secondary), #bd00ff) !important;
+  transition: width 0.1s linear, background-color 0.5s ease;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+}
+
+.timer-bar.warning {
+  background: linear-gradient(to right, var(--color-primary), #ff0055) !important;
+  box-shadow: 0 0 8px rgba(255, 46, 147, 0.8) !important;
+}
+
+/* Contenedor Principal de las Imágenes */
+.game-play-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1000px;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.image-frame-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-frame {
+  background: #0f0b24;
+  border: 8px solid var(--color-border) !important;
+  border-radius: 24px;
+  box-shadow: 0 12px 0 var(--color-border);
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  max-width: 600px; /* Ancho máximo de 600px para pantallas grandes */
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+}
+
+.image-frame-wrapper:first-child .image-frame {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 20px rgba(255, 46, 147, 0.4), 0 12px 0 var(--color-border);
+}
+
+.image-frame-wrapper:last-child .image-frame {
+  border-color: var(--color-secondary) !important;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4), 0 12px 0 var(--color-border);
+}
+
+/* Sacudida al errar */
+.image-frame.shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.image-frame svg, .image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Marcadores de Diferencias Encontradas */
+.found-marker {
+  position: absolute;
+  width: 10%;
+  height: 13.33%; /* Mantener proporción 4:3 para círculo perfecto */
+  border: 4px dashed var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--color-accent);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 10;
+  animation: drawCircle 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards;
+}
+
+/* Efecto rotulado / hecho a mano */
+.found-marker::after {
+  content: '✨';
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  font-size: 1.2rem;
+  animation: spinStar 1.5s linear infinite;
+}
+
+@keyframes drawCircle {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-45deg); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes spinStar {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Marcador temporal de clic incorrecto (Cruz Roja) */
+.error-marker {
+  position: absolute;
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 15;
+  text-shadow: 0px 0px 10px var(--color-primary);
+  animation: popX 0.6s ease-out forwards;
+}
+
+@keyframes popX {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  30% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+
+/* Panel de Mascota/Pistas Compacto en Pantalla de Juego */
+.game-hints-panel {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 1000px;
+  background: rgba(26, 12, 47, 0.8) !important;
+  backdrop-filter: blur(10px);
+  border: 3px solid var(--color-border) !important;
+  border-radius: 20px;
+  padding: 8px 15px;
+  box-shadow: 0 4px 0 var(--color-border), 0 0 10px rgba(0, 229, 255, 0.15);
+  color: white !important;
+  margin-bottom: 15px;
+}
+
+.mascot-sprite-mini {
+  width: 48px;
+  height: 48px;
+  background-color: rgba(0, 229, 255, 0.15);
+  border: 2.5px solid var(--color-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  box-shadow: 0 0 10px var(--color-secondary);
+  animation: idleMascot 2s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes idleMascot {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-4px) scale(1.05); }
+}
+
+.hints-bubble-compact {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.hints-bubble-compact p {
+  margin: 0;
+  font-weight: 500;
+  font-size: 1rem;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   Modales (Pestañas de alerta y victoria)
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(12, 5, 29, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #180D2B, #0F071D) !important;
+  border: 6px solid var(--color-primary) !important;
+  border-radius: 40px;
+  width: 100%;
+  max-width: 500px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 46, 147, 0.4), 0 16px 0 rgba(0,0,0,0.3) !important;
+  transform: scale(0.5);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #fff !important;
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-content h2 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  color: var(--color-primary) !important;
+  text-shadow: 0 0 12px rgba(255, 46, 147, 0.8), 0 0 24px rgba(255, 46, 147, 0.4) !important;
+}
+
+.modal-content p {
+  font-size: 1.3rem;
+  margin-bottom: 25px;
+  color: #bfaed8 !important;
+}
+
+.modal-mascot {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  display: inline-block;
+  animation: celebrate 1s ease infinite alternate;
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1) rotate(-10deg); }
+  100% { transform: scale(1.2) rotate(10deg); }
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ==========================================================================
+   Efectos de Confeti de Estrellas
+   ========================================================================== */
+
+.confetti-particle {
+  position: fixed;
+  top: -50px;
+  pointer-events: none;
+  z-index: 90;
+  font-size: 1.5rem;
+  animation: fallConfetti 3s linear forwards;
+}
+
+@keyframes fallConfetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   Estilos del menú de configuración de audio
+   ========================================================================== */
+.audio-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+/* ==========================================================================
+   Reglas de diferencias para los SVGs
+   ========================================================================== */
+
+/* Las clases con prefijo .diff- controlan qué elementos se muestran en
+   el lado Original (.original-side) o en el Modificado (.modified-side) */
+
+/* Nivel 1 (Granja) */
+.modified-side .diff-sun-smile { display: none !important; }
+.modified-side .diff-cloud-2 { display: none !important; }
+.modified-side .diff-window-orig { display: none !important; }
+.original-side .diff-window-mod { display: none !important; }
+.modified-side .diff-duck { display: none !important; }
+.modified-side .diff-flower-petals-orig { display: none !important; }
+.original-side .diff-flower-petals-mod { display: none !important; }
+
+/* Nivel 2 (Mar) */
+.modified-side .diff-seaweed-flower { display: none !important; }
+.modified-side .diff-octopus-eye-orig { display: none !important; }
+.original-side .diff-octopus-eye-mod { display: none !important; }
+.modified-side .diff-chest-lock { display: none !important; }
+.modified-side .diff-bubbles-orig { display: none !important; }
+.original-side .diff-bubbles-mod { display: none !important; }
+.modified-side .diff-star-orig { display: none !important; }
+.original-side .diff-star-mod { display: none !important; }
+
+/* Nivel 3 (Espacio) */
+.modified-side .diff-planet-rings { display: none !important; }
+.modified-side .diff-moon-face { display: none !important; }
+.modified-side .diff-alien-antenna { display: none !important; }
+.modified-side .diff-rocket-fire-orig { display: none !important; }
+.original-side .diff-rocket-fire-mod { display: none !important; }
+.modified-side .diff-rocket-logo-orig { display: none !important; }
+.original-side .diff-rocket-logo-mod { display: none !important; }
+
+
+/* ==========================================================================
+   Estilos del Creador de Niveles
+   ========================================================================== */
+.creator-layout {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 15px;
+}
+
+.creator-sidebar {
+  flex: 1;
+  max-width: 380px;
+  background: rgba(30, 15, 60, 0.85) !important;
+  border: 4px solid var(--color-primary) !important;
+  border-radius: 24px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 0 15px rgba(255, 46, 147, 0.3), var(--bubble-shadow);
+  max-height: 75vh;
+  overflow-y: auto;
+  color: #fff !important;
+}
+
+.creator-workspace {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.creator-frames-container {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+
+.creator-frame-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.creator-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.creator-form-group label {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #bfaed8 !important;
+}
+
+.creator-input, .creator-select {
+  padding: 10px;
+  border: 3px solid var(--color-border) !important;
+  border-radius: 12px;
+  font-family: var(--font-kids);
+  font-size: 1rem;
+  outline: none;
+  background: #1b0d36 !important;
+  color: #ffffff !important;
+  transition: border-color 0.2s;
+}
+
+.creator-input::placeholder {
+  color: #8d7cae;
+}
+
+.creator-input:focus, .creator-select:focus {
+  border-color: var(--color-secondary) !important;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.file-inputs-row {
+  display: flex;
+  gap: 10px;
+}
+
+.file-input-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #13092b !important;
+  border: 3px dashed var(--color-secondary) !important;
+  border-radius: 12px;
+  padding: 10px 5px;
+  position: relative;
+  color: #ffffff;
+}
+
+.file-label-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.file-input-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.btn-upload {
+  font-size: 1rem;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border-width: 3px;
+  box-shadow: 0 4px 0 var(--color-border);
+  pointer-events: none;
+}
+
+.creator-diff-list {
+  border: 3px solid var(--color-border) !important;
+  border-radius: 12px;
+  height: 150px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #13092b !important;
+}
+
+.creator-diff-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1b0d36 !important;
+  border: 2px solid var(--color-border) !important;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #fff !important;
+}
+
+.creator-diff-item-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.creator-diff-item-hint {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.creator-diff-item-msg {
+  font-size: 0.8rem;
+  color: #bfaed8 !important;
+}
+
+.btn-delete-diff {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-delete-diff:hover {
+  transform: scale(1.2);
+}
+
+.empty-list-text {
+  color: #8d7cae !important;
+  text-align: center;
+  padding: 30px 10px;
+  font-size: 0.9rem;
+}
+
+.creator-instructions {
+  background: rgba(30, 15, 60, 0.85) !important;
+  border: 4px solid var(--color-secondary) !important;
+  border-radius: 20px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3), 0 4px 0 var(--color-border);
+  color: #ffffff;
+}
+
+.mascot-mini {
+  font-size: 2rem;
+  animation: celebrate 1s ease infinite alternate;
+}
+
+.creator-canvas-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #13092b !important;
+  color: #8d7cae !important;
+  font-weight: 600;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1rem;
+  border: 3px dashed var(--color-border);
+  border-radius: 16px;
+}
+
+/* Marcadores sobre la imagen en el creador */
+.creator-marker {
+  position: absolute;
+  width: 10%;
+  height: 13.33%;
+  border: 3px dashed var(--color-primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 112, 67, 0.25);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 0px 1px 3px black;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  transition: transform 0.1s, background-color 0.1s;
+}
+
+.creator-marker:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: rgba(255, 112, 67, 0.4);
+}
+
+/* Marcador de previsualización temporal en edición */
+.edit-preview-marker {
+  position: absolute;
+  border: 3px solid var(--color-secondary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 12;
+  background: rgba(76, 175, 80, 0.2);
+  display: none;
+}
+
+.creator-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.creator-actions button {
+  flex: 1;
+  font-size: 1.15rem;
+  padding: 10px 15px;
+  box-shadow: 0 5px 0 var(--color-border);
+}
+
+.creator-actions button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+/* Badge para niveles personalizados en la cuadrícula */
+.level-card .creator-card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--color-primary);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2.5px solid var(--color-border);
+  box-shadow: 0 2px 0 var(--color-border);
+  z-index: 4;
+}
+
+/* Modo Administrador */
+.admin-only {
+  display: none !important;
+}
+
+body.admin-mode-active .admin-only {
+  display: inline-flex !important;
+}
+
+body.admin-mode-active div.admin-only,
+body.admin-mode-active section.admin-only {
+  display: flex !important;
+}
+
+/* Botón de eliminación en la tarjeta */
+.btn-delete-level-card {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border: 3px solid var(--color-border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: none; /* Oculto por defecto */
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.1s, background-color 0.1s;
+  box-shadow: 0 2px 0 var(--color-border);
+}
+
+body.admin-mode-active .btn-delete-level-card {
+  display: flex !important;
+}
+
+.btn-delete-level-card:hover {
+  transform: scale(1.15);
+  background: #ffebee;
+}
+
+.btn-delete-level-card:active {
+  transform: scale(0.95);
+  box-shadow: 0 0px 0 var(--color-border);
+}
+
+/* ==========================================================================
+   Adaptación Responsiva
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .creator-layout {
+    flex-direction: column-reverse; /* Canvases on top, settings at bottom for easy markup */
+    gap: 20px;
+  }
+  .creator-sidebar {
+    max-width: 100%;
+    max-height: none;
+  }
+  .creator-frames-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  #menu-screen h1 {
+    font-size: 3rem;
+  }
+  
+  .game-play-area {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .image-frame {
+    max-width: 100%; /* Aprovecha el 100% del ancho de pantalla en móviles y tabletas */
+    border-width: 4px !important; /* Borde más fino para ahorrar espacio */
+  }
+  
+  .game-hints-panel {
+    padding: 6px 12px;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .mascot-sprite-mini {
+    width: 38px;
+    height: 38px;
+    font-size: 1.4rem;
+  }
+
+  .hints-bubble-compact p {
+    font-size: 0.85rem;
+  }
+
+  .stats-panel {
+    font-size: 1.1rem;
+  }
+
+  .stat-bubble {
+    padding: 8px 14px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Header grid for mobile - Creator screen */
+  .game-header {
+    display: grid;
+    grid-template-areas: 
+      "back title"
+      "stats stats";
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  #btn-creator-back {
+    grid-area: back;
+  }
+  .game-header .game-title-bar {
+    grid-area: title;
+    text-align: center;
+  }
+  .game-header .game-title-bar h2 {
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .game-header .stats-panel {
+    grid-area: stats;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  .game-header .stat-bubble {
+    padding: 6px 12px;
+    font-size: 1rem;
+    border-radius: 12px;
+    border-width: 2.5px !important;
+  }
+
+  .game-dashboard-bar {
+    padding: 6px 10px;
+    gap: 8px;
+    border-radius: 16px;
+  }
+  .dashboard-level-title {
+    font-size: 1rem;
+  }
+  .dashboard-stat {
+    font-size: 0.85rem;
+    padding: 3px 6px;
+    border-radius: 8px;
+    gap: 4px;
+  }
+  #lives-container {
+    min-width: 60px;
+    gap: 2px;
+  }
+  #lives-container span {
+    font-size: 0.9rem !important;
+  }
+  .btn-compact-round {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    border-width: 2.5px;
+    box-shadow: 0 3px 0 var(--color-border);
+  }
+  .btn-back-neon {
+    font-size: 1.8rem;
+  }
+
+  /* Audio and Admin controls header scale down */
+  .audio-controls {
+    top: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+  .audio-controls button {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+
+  /* Responsive level selector grid */
+  .levels-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  .level-card {
+    padding: 15px;
+    border-radius: 22px;
+    border-width: 3px !important;
+  }
+  .level-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+  }
+  .level-card p {
+    font-size: 0.85rem;
+  }
+  .level-card .difficulty-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  .level-card .stars {
+    font-size: 0.95rem;
+  }
+  .btn-delete-level-card {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    top: 8px;
+    right: 8px;
+  }
+  .level-card .creator-card-badge {
+    top: 8px;
+    left: 8px;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Main menu title */
+  #menu-screen h1 {
+    font-size: 2.8rem;
+  }
+
+  /* Modal responsive scale */
+  .modal-content {
+    padding: 25px 15px;
+    border-radius: 30px;
+    border-width: 4px !important;
+  }
+  .modal-content h2 {
+    font-size: 2.2rem;
+  }
+  .modal-mascot {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+  }
+  .modal-content p {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+}

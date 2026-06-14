@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Busca las Diferencias! - Juego Educativo para Niños</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Un divertido juego infantil de buscar diferencias en HTML y JS. Encuentra los cambios ocultos en divertidas escenas vectoriales diseñadas para niños.">
+  <meta name="keywords" content="buscar diferencias, juego infantil, juego educativo, niños, html5, svg, juego de logica">
+  <meta name="author" content="Antigravity">
+  
+  <!-- Estilos y Tipografías -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Configuración de Niveles -->
+  <script src="js/levels.js" defer></script>
+  <!-- Motor de Juego -->
+  <script src="js/game.js" defer></script>
+</head>
+<body>
+
+  <!-- Contenedor para nubes animadas de fondo -->
+  <div class="bg-decorations" aria-hidden="true"></div>
+
+  <!-- ==========================================================================
+       PANTALLA 1: MENU DE INICIO
+       ========================================================================== -->
+  <main id="menu-screen" class="screen active">
+    <!-- Botones de Cabecera (Sonido y Admin) - Solo visibles en el menú principal -->
+    <div class="audio-controls">
+      <button id="btn-admin-access" class="btn-kids btn-sky btn-round" title="Acceso Administrador" aria-label="Admin Access">🔑</button>
+      <button id="btn-toggle-sound" class="btn-kids btn-yellow btn-round" title="Activar/Desactivar sonido" aria-label="Toggle Sound">🔊</button>
+    </div>
+
+    <div class="logo-container">
+      <!-- Mascota de Detective Dibujada con SVG (Estilo K-Pop Huntrix Cyber-Neon) -->
+      <svg viewBox="0 0 200 200" width="100%" height="100%">
+        <!-- Orejas -->
+        <ellipse cx="40" cy="80" rx="20" ry="40" fill="#A000FF" stroke="#14092B" stroke-width="4" transform="rotate(15, 40, 80)"/>
+        <ellipse cx="160" cy="80" rx="20" ry="40" fill="#A000FF" stroke="#14092B" stroke-width="4" transform="rotate(-15, 160, 80)"/>
+        
+        <!-- Cabeza -->
+        <circle cx="100" cy="100" r="60" fill="#ECEFF1" stroke="#14092B" stroke-width="5" />
+        
+        <!-- Manchas en los ojos -->
+        <ellipse cx="80" cy="90" rx="20" ry="25" fill="#FF2E93" opacity="0.85" />
+        
+        <!-- Ojos -->
+        <circle cx="80" cy="95" r="8" fill="#FFF" stroke="#14092B" stroke-width="2"/>
+        <circle cx="82" cy="95" r="4" fill="#000"/>
+        <circle cx="84" cy="93" r="1.5" fill="#FFF"/>
+
+        <circle cx="120" cy="95" r="8" fill="#FFF" stroke="#14092B" stroke-width="2"/>
+        <circle cx="118" cy="95" r="4" fill="#000"/>
+        <circle cx="116" cy="93" r="1.5" fill="#FFF"/>
+
+        <!-- Hocico -->
+        <ellipse cx="100" cy="122" rx="22" ry="15" fill="#FFF" stroke="#14092B" stroke-width="3" />
+        <polygon points="90,115 110,115 100,125" fill="#14092B" rx="3" />
+        <path d="M 100 125 Q 95 133 90 130 M 100 125 Q 105 133 110 130" stroke="#14092B" stroke-width="3" stroke-linecap="round" fill="none" />
+        
+        <!-- Gorra de Detective -->
+        <path d="M 40 55 C 40 10, 160 10, 160 55 Z" fill="#FF2E93" stroke="#14092B" stroke-width="4" />
+        <ellipse cx="100" cy="55" rx="70" ry="8" fill="#00E5FF" stroke="#14092B" stroke-width="4" />
+        
+        <!-- Lupa flotante -->
+        <g transform="translate(145, 125) rotate(-20)">
+          <line x1="0" y1="20" x2="0" y2="50" stroke="#00E5FF" stroke-width="8" stroke-linecap="round" />
+          <circle cx="0" cy="0" r="25" fill="#FFF500" fill-opacity="0.3" stroke="#FFF500" stroke-width="5" />
+          <path d="M -12 -12 A 17 17 0 0 1 12 -12" stroke="#FFF" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
+        </g>
+      </svg>
+    </div>
+    
+    <h1 id="main-title">¡Busca las Diferencias!</h1>
+    <p style="font-size: 1.4rem; margin-bottom: 30px; text-align: center; color: #bfaed8;">Entrena tu vista de súper detective y encuentra los 5 cambios ocultos en cada escena.</p>
+    
+    <button id="btn-start-game" class="btn-kids btn-orange" aria-label="Iniciar Juego">¡JUGAR! 🚀</button>
+    <button id="btn-create-level" class="btn-kids btn-sky admin-only" aria-label="Crear Niveles">CREAR NIVEL 🎨</button>
+  </main>
+
+  <!-- ==========================================================================
+       PANTALLA 2: SELECTOR DE NIVELES
+       ========================================================================== -->
+  <section id="level-screen" class="screen">
+    <h2>Elige una Aventura</h2>
+    
+    <div id="levels-grid" class="levels-grid">
+      <!-- Se autocompleta desde JavaScript -->
+    </div>
+    
+    <div class="level-screen-actions" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; width: 100%;">
+      <button id="btn-back-menu" class="btn-kids btn-sky" aria-label="Volver al menú de inicio">➔ Volver al Inicio</button>
+      <button id="btn-reset-everything" class="btn-kids btn-orange admin-only" aria-label="Restablecer todos los niveles y progreso">Restablecer Todo 🔄</button>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PANTALLA 3: PANTALLA DE JUEGO
+       ========================================================================== -->
+  <section id="game-screen" class="screen">
+    <!-- Cabecera del juego integrada y compacta -->
+    <header class="game-dashboard-bar">
+      <!-- Botón Volver -->
+      <button id="btn-back-levels" class="btn-back-neon" title="Ir a la lista de niveles" aria-label="Back to Levels">←</button>
+      
+      <!-- Título de nivel corto -->
+      <h3 id="level-name" class="dashboard-level-title">Nivel</h3>
+      
+      <!-- Contador de Estrellas -->
+      <div id="diff-counter" class="dashboard-stat" title="Diferencias encontradas" aria-live="polite">⭐ 0/5</div>
+      
+      <!-- Contenedor de Vidas -->
+      <div id="lives-container" class="dashboard-stat" title="Vidas restantes">❤️❤️❤️</div>
+      
+      <!-- Botón Pista -->
+      <button id="btn-hint" class="btn-kids btn-yellow btn-compact-round" title="Pedir una pista" aria-label="Hint Button">💡</button>
+      
+      <!-- Barra de tiempo integrada (Línea de progreso al fondo del dashboard) -->
+      <div class="dashboard-timer-container">
+        <div id="timer-bar" class="timer-bar"></div>
+      </div>
+    </header>
+
+    <!-- Panel de Mascota/Pistas Compacto -->
+    <div class="game-hints-panel">
+      <div id="mascot" class="mascot-sprite-mini" aria-hidden="true">🐶</div>
+      <div class="hints-bubble-compact">
+        <p id="mascot-bubble-text">¡Hola! Ayúdame a buscar las 5 diferencias. ¡Abre bien los ojos! 🔍</p>
+      </div>
+    </div>
+
+    <!-- Contenedores de las imágenes arriba y abajo -->
+    <div class="game-play-area">
+      <!-- Panel Superior (Original) -->
+      <div class="image-frame-wrapper">
+        <div id="orig-frame" class="image-frame">
+          <div class="frame-click-area"></div>
+          <!-- El SVG/Imagen se inyecta dinámicamente -->
+        </div>
+      </div>
+      
+      <!-- Panel Inferior (Modificado) -->
+      <div class="image-frame-wrapper">
+        <div id="mod-frame" class="image-frame">
+          <div class="frame-click-area"></div>
+          <!-- El SVG/Imagen se inyecta dinámicamente -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PANTALLA 4: CREADOR DE NIVELES
+       ========================================================================== -->
+  <section id="creator-screen" class="screen">
+    <header class="game-header">
+      <button id="btn-creator-back" class="btn-back-neon" title="Volver al inicio" aria-label="Back to Menu">←</button>
+      <div class="game-title-bar">
+        <h2>Creador de Niveles 🎨</h2>
+      </div>
+      <div class="stats-panel">
+        <div class="stat-bubble">
+          ⭐ <span id="creator-diff-count">0</span> / 5
+        </div>
+      </div>
+    </header>
+
+    <div class="creator-layout">
+      <!-- Panel de Configuración (Izquierda) -->
+      <div class="creator-sidebar">
+        <div class="creator-form-group">
+          <label for="creator-name">Título del Nivel:</label>
+          <input type="text" id="creator-name" placeholder="Ej. Mi Aventura" class="creator-input">
+        </div>
+
+        <div class="creator-form-group">
+          <label for="creator-difficulty">Dificultad:</label>
+          <select id="creator-difficulty" class="creator-select">
+            <option value="Fácil">Fácil</option>
+            <option value="Medio" selected>Medio</option>
+            <option value="Difícil">Difícil</option>
+          </select>
+        </div>
+
+        <div class="creator-form-group">
+          <label for="creator-requires">Desbloquear después de:</label>
+          <select id="creator-requires" class="creator-select">
+            <!-- Se llena dinámicamente con niveles activos -->
+          </select>
+        </div>
+
+        <div class="creator-form-group">
+          <label>Imágenes (Original y Copia):</label>
+          <div class="file-inputs-row">
+            <div class="file-input-wrapper">
+              <span class="file-label-text">Original</span>
+              <input type="file" id="creator-file-orig" accept="image/*" class="file-input-hidden">
+              <button id="btn-upload-orig" class="btn-kids btn-orange btn-upload">Subir 📁</button>
+            </div>
+            <div class="file-input-wrapper">
+              <span class="file-label-text">Copia</span>
+              <input type="file" id="creator-file-mod" accept="image/*" class="file-input-hidden">
+              <button id="btn-upload-mod" class="btn-kids btn-orange btn-upload">Subir 📁</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos Opcionales para Rutas de Servidor -->
+        <div class="creator-form-group">
+          <label style="font-size: 0.95rem; color: #795548;">Rutas en Servidor (Opcional):</label>
+          <input type="text" id="creator-server-orig" placeholder="Ej. img/mi_nivel_orig.jpg" class="creator-input" style="font-size: 0.9rem; padding: 6px 10px;">
+          <input type="text" id="creator-server-mod" placeholder="Ej. img/mi_nivel_mod.jpg" class="creator-input" style="font-size: 0.9rem; padding: 6px 10px; margin-top: 4px;">
+        </div>
+
+        <div class="creator-form-group">
+          <label>Diferencias:</label>
+          <div id="creator-diff-list" class="creator-diff-list">
+             <p class="empty-list-text">Sube ambas imágenes y haz clic sobre la "Copia" para marcar diferencias.</p>
+          </div>
+        </div>
+
+        <div class="creator-actions">
+          <button id="btn-save-level" class="btn-kids btn-green" disabled>Guardar 💾</button>
+          <button id="btn-export-level" class="btn-kids btn-yellow" disabled>Exportar 📤</button>
+        </div>
+      </div>
+
+      <!-- Lienzos de Trabajo (Derecha) -->
+      <div class="creator-workspace">
+        <div class="creator-frames-container">
+          <!-- Lienzo Original -->
+          <div class="creator-frame-wrapper">
+            <span class="frame-label">Original</span>
+            <div id="creator-orig-frame" class="image-frame">
+              <div class="creator-canvas-placeholder">Carga la imagen original</div>
+            </div>
+          </div>
+          
+          <!-- Lienzo Modificado -->
+          <div class="creator-frame-wrapper">
+            <span class="frame-label">Copia (Haz clic para marcar)</span>
+            <div id="creator-mod-frame" class="image-frame">
+              <div class="creator-canvas-placeholder">Carga la imagen modificada</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="creator-instructions">
+          <span class="mascot-mini">🐶</span>
+          <p id="creator-instructions-text">¡Hola! Sube las dos imágenes. Después haz clic en la "Copia" para marcar las diferencias como si estuvieras resolviendo el juego. ¡Necesitamos 5!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       MODALES Y VENTANAS FLOTANTES
+       ========================================================================== -->
+  
+  <!-- Modal 1: ¡Ganaste / Victoria! -->
+  <div id="win-modal" class="modal-overlay" role="dialog" aria-labelledby="win-title" aria-modal="true">
+    <div class="modal-content">
+      <span class="modal-mascot" aria-hidden="true">🏆</span>
+      <h2 id="win-title">¡Excelente!</h2>
+      <p id="win-desc">¡Has encontrado todas las diferencias del nivel!</p>
+      <div class="modal-buttons">
+        <button id="btn-win-next" class="btn-kids btn-green">Siguiente Nivel ➔</button>
+        <button id="btn-win-menu" class="btn-kids btn-sky">Ver Niveles</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: ¡Se acabó / Derrota! -->
+  <div id="gameover-modal" class="modal-overlay" role="dialog" aria-labelledby="gameover-title" aria-modal="true">
+    <div class="modal-content">
+      <span class="modal-mascot" aria-hidden="true">😢</span>
+      <h2 id="gameover-title">¡Inténtalo de nuevo!</h2>
+      <p id="gameover-desc">No te preocupes, ¡la práctica hace al maestro!</p>
+      <div class="modal-buttons">
+        <button id="btn-retry" class="btn-kids btn-orange">Volver a Jugar 🔄</button>
+        <button id="btn-gameover-menu" class="btn-kids btn-sky">Salir a Niveles</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Configurar Diferencia -->
+  <div id="diff-modal" class="modal-overlay" role="dialog" aria-labelledby="diff-modal-title" aria-modal="true">
+    <div class="modal-content">
+      <h2 id="diff-modal-title">Configurar Diferencia</h2>
+      <p>Cuéntale al detective qué cambia aquí:</p>
+      
+      <div class="creator-form-group" style="text-align: left; width: 100%; margin-bottom: 12px;">
+        <label for="diff-hint-input" style="font-size: 1.1rem; margin-bottom: 5px; display: block; font-weight: 700;">Pista / Ayuda para el jugador:</label>
+        <input type="text" id="diff-hint-input" placeholder="Ej. El color de la flor o la estrella que falta" class="creator-input" style="width: 100%;">
+      </div>
+      
+      <div class="creator-form-group" style="text-align: left; width: 100%; margin-bottom: 12px;">
+        <label for="diff-message-input" style="font-size: 1.1rem; margin-bottom: 5px; display: block; font-weight: 700;">Mensaje de la Mascota al encontrarla:</label>
+        <input type="text" id="diff-message-input" placeholder="Ej. ¡Genial! La estrella ahora brilla en morado." class="creator-input" style="width: 100%;">
+      </div>
+      
+      <div class="creator-form-group" style="text-align: left; width: 100%; margin-bottom: 20px;">
+        <label for="diff-radius-input" style="font-size: 1.1rem; margin-bottom: 5px; display: block; font-weight: 700;">Radio del área de clic (Tamaño: <span id="diff-radius-val">6%</span>):</label>
+        <input type="range" id="diff-radius-input" min="3" max="15" value="6" step="0.5" style="width: 100%; cursor: pointer;">
+      </div>
+
+      <div class="modal-buttons" style="flex-direction: row; gap: 15px;">
+        <button id="btn-diff-cancel" class="btn-kids btn-sky" style="flex: 1; font-size: 1.2rem;">Cancelar</button>
+        <button id="btn-diff-save" class="btn-kids btn-green" style="flex: 1; font-size: 1.2rem;">Añadir ➕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Exportar Configuración -->
+  <div id="export-modal" class="modal-overlay" role="dialog" aria-labelledby="export-modal-title" aria-modal="true">
+    <div class="modal-content" style="max-width: 650px; padding: 30px 20px;">
+      <h2 id="export-modal-title">Código del Nivel</h2>
+      <p>Copia este código y añádelo a tu archivo `js/levels.js` en tu servidor:</p>
+      
+      <textarea id="export-code-area" readonly class="export-textarea" style="width: 100%; height: 220px; font-family: monospace; padding: 10px; border: 3px solid var(--color-border); border-radius: 12px; font-size: 0.85rem; resize: none; white-space: pre; background: #263238; color: #eceff1; margin-bottom: 15px;"></textarea>
+      
+      <div class="modal-buttons" style="flex-direction: row; gap: 15px;">
+        <button id="btn-export-copy" class="btn-kids btn-yellow" style="flex: 1; font-size: 1.2rem;">Copiar 📋</button>
+        <button id="btn-export-close" class="btn-kids btn-sky" style="flex: 1; font-size: 1.2rem;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Acceso Administrador (PIN) -->
+  <div id="admin-modal" class="modal-overlay" role="dialog" aria-labelledby="admin-modal-title" aria-modal="true">
+    <div class="modal-content" style="max-width: 400px; padding: 35px 25px;">
+      <span class="modal-mascot" aria-hidden="true">🔒</span>
+      <h2 id="admin-modal-title" style="font-size: 2.2rem; margin-bottom: 10px;">Acceso Admin</h2>
+      <p style="font-size: 1.1rem; margin-bottom: 15px;">Ingresa la contraseña para entrar al modo de administración:</p>
+      
+      <div class="creator-form-group" style="text-align: left; width: 100%; margin-bottom: 20px;">
+        <input type="password" id="admin-pin-input" placeholder="Contraseña de Administrador" class="creator-input" style="width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: normal;">
+        <span id="admin-error-msg" style="color: #e53935; font-size: 0.95rem; font-weight: 700; text-align: center; display: none; margin-top: 8px;">¡Contraseña incorrecta! Inténtalo de nuevo.</span>
+      </div>
+
+      <div class="modal-buttons" style="flex-direction: row; gap: 15px;">
+        <button id="btn-admin-cancel" class="btn-kids btn-sky" style="flex: 1; font-size: 1.2rem;">Cancelar</button>
+        <button id="btn-admin-submit" class="btn-kids btn-green" style="flex: 1; font-size: 1.2rem;">Entrar ➔</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

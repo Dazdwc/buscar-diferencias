@@ -1,0 +1,26 @@
+services:
+  gateway:
+    build: .
+    container_name: buscar_diferencias_web
+    ports:
+      - "8085:80"
+    volumes:
+      - .:/usr/share/nginx/html
+    networks:
+      - diferencias-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: buscar_diferencias_tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --url http://gateway:80
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - gateway
+    networks:
+      - diferencias-network
+
+networks:
+  diferencias-network:
+    driver: bridge
