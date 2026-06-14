@@ -1,9 +1,11 @@
-FROM nginx:alpine
+FROM node:20-alpine
 
-# Copiar todos los archivos del proyecto a la carpeta que sirve Nginx
-COPY . /usr/share/nginx/html
+WORKDIR /app
+
+# Copiar todos los archivos del proyecto
+COPY . /app
 
 # Exponer el puerto 80
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server.js"]

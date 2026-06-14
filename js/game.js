@@ -61,7 +61,7 @@ function loadAllLevels() {
   }
 }
 
-function deleteLevel(levelId, isCustom) {
+async function deleteLevel(levelId, isCustom) {
   if (isCustom) {
     let savedLevels = [];
     const saved = localStorage.getItem("buscar_diferencias_custom_levels");
@@ -74,6 +74,16 @@ function deleteLevel(levelId, isCustom) {
     }
     savedLevels = savedLevels.filter(lvl => lvl.id !== levelId);
     localStorage.setItem("buscar_diferencias_custom_levels", JSON.stringify(savedLevels));
+    
+    try {
+      await fetch('/api/custom-levels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(savedLevels)
+      });
+    } catch (e) {
+      console.error("Error syncing deleted custom level to server:", e);
+    }
   } else {
     let deletedBaseIds = [];
     const saved = localStorage.getItem("buscar_diferencias_deleted_base_levels");
@@ -88,6 +98,16 @@ function deleteLevel(levelId, isCustom) {
       deletedBaseIds.push(levelId);
     }
     localStorage.setItem("buscar_diferencias_deleted_base_levels", JSON.stringify(deletedBaseIds));
+    
+    try {
+      await fetch('/api/deleted-levels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(deletedBaseIds)
+      });
+    } catch (e) {
+      console.error("Error syncing deleted base level to server:", e);
+    }
   }
   
   GameState.completedLevels = GameState.completedLevels.filter(id => id !== levelId);
@@ -97,10 +117,18 @@ function deleteLevel(levelId, isCustom) {
   renderLevelGrid();
 }
 
-function resetEverything() {
+async function resetEverything() {
   if (confirm("¿Quieres restablecer el juego al estado inicial? Esto restaurará todos los niveles iniciales y borrará tu progreso y niveles creados.")) {
     localStorage.removeItem("buscar_diferencias_deleted_base_levels");
     localStorage.removeItem("buscar_diferencias_custom_levels");
+    
+    try {
+      await fetch('/api/custom-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify([]) });
+      await fetch('/api/deleted-levels', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify([]) });
+    } catch (e) {
+      console.error("Error resetting levels on server:", e);
+    }
+
     GameState.resetProgress();
     loadAllLevels();
     renderLevelGrid();
@@ -386,8 +414,31 @@ const Mascot = {
 // Lógica de Renderizado y Flujo
 // ==========================================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+async function syncWithServer() {
+  try {
+    const customRes = await fetch('/api/custom-levels');
+    if (customRes.ok) {
+      const customLevels = await customRes.json();
+      localStorage.setItem("buscar_diferencias_custom_levels", JSON.stringify(customLevels));
+    }
+  } catch (e) {
+    console.warn("Could not sync custom levels from server:", e);
+  }
+
+  try {
+    const deletedRes = await fetch('/api/deleted-levels');
+    if (deletedRes.ok) {
+      const deletedLevels = await deletedRes.json();
+      localStorage.setItem("buscar_diferencias_deleted_base_levels", JSON.stringify(deletedLevels));
+    }
+  } catch (e) {
+    console.warn("Could not sync deleted levels from server:", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
   updateAdminUI();
+  await syncWithServer();
   loadAllLevels();
   GameState.loadProgress();
   Mascot.init();
@@ -1331,7 +1382,7 @@ const LevelCreator = {
     }
   },
   
-  saveLevel() {
+  async saveLevel() {
     const name = document.getElementById("creator-name").value.trim();
     const difficulty = document.getElementById("creator-difficulty").value;
     const requiresIdInput = document.getElementById("creator-requires").value;
@@ -1371,6 +1422,16 @@ const LevelCreator = {
     }
     savedLevels.push(newLevel);
     localStorage.setItem("buscar_diferencias_custom_levels", JSON.stringify(savedLevels));
+    
+    try {
+      await fetch('/api/custom-levels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(savedLevels)
+      });
+    } catch (e) {
+      console.error("Error syncing new level to server:", e);
+    }
     
     alert(`¡Nivel "${name}" guardado con éxito! Ya puedes jugarlo en la lista de aventuras.`);
     
